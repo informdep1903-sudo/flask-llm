@@ -6,7 +6,7 @@
     # request - объект для работы с HTTP-запросами
     # jsonify - функция для создания JSON-ответов
 from flask import Flask, render_template, request, jsonify
-    # Импортируем компоненты для работы с базой данных и чатом
+    # Импортируем компоненты из models.py для работы с базой данных и чатом
 from models import db, ChatHistory, chat_with_llm
 
 # Создаем экземпляр Flask-приложения
@@ -17,6 +17,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db"
 db.init_app(app)
 
 # Маршрут для главной страницы
+#  @app.route("/") - декоратор во Flask, который:
+#  определяет URL-маршрут и означает корневой путь сайта (например, http://localhost:5000/)
+#  Когда пользователь переходит по этому URL, Flask вызывает функцию home()
 @app.route("/")
 def home():
     # Получаем всю историю чата из базы данных, отсортированную по времени
