@@ -1,24 +1,75 @@
+// Обработчик отправки формы (submit event):
+// e.preventDefault() отключает стандартное поведение формы (отправку данных и перезагрузку страницы),
+// чтобы мы могли обработать отправку  без обновления страницы
+// Параметр 'e' (или event) - это объект событие, который автоматически передается в функцию-обработчик
+// Он содержит информацию о произошедшем событии (в данном случае событие submit формы)
+// и предоставляет методы для управления этим событием (например, preventDefault)
 document.getElementById('chat-form').addEventListener('submit', async function(e) {
+    // Предотвращаем стандартное поведение формы
     e.preventDefault();
-    const input = document.getElementById('user-input');
-    const chatBox = document.getElementById('chat-box');
+    
+    // Получаем ссылки на элементы DOM
+    // DOM (Document Object Model) - это представление HTML-документа в виде дерева объектов,
+    // где каждый HTML-элемент является узлом. DOM позволяет JavaScript:
+    // - Получать доступ к элементам страницы
+    // - Изменять их содержимое, стили и атрибуты
+    // - Добавлять и удалять элементы
+    // - Реагировать на действия пользователя
+    
+    // Получаем элементы страницы через DOM-методы:
+    // document - корневой объект DOM
+    // getElementById - метод поиска элемента по его id атрибуту
+    const input = document.getElementById('user-input'); // Находим поле ввода
+    const chatBox = document.getElementById('chat-box'); // Находим контейнер чата
+    
+    
+    // Работаем со свойствами DOM-элементов:
+    // input.value - получаем текст из поля ввода
+    // chatBox.innerHTML - изменяем HTML-содержимое контейнера чата
+    // chatBox.scrollTop/scrollHeight - управляем прокруткой
+    
+    // Получаем текст сообщения и удаляем лишние пробелы
     const userMessage = input.value.trim();
+    
+    // Проверяем, не пустое ли сообщение
     if (!userMessage) return;
 
-    // Display user message
+    // Отображаем сообщение пользователя в чате
+    // Добавляем новые элементы сообщения пользователя через innerHTML
+    //  <div> - HTML-тег для создания блочного элемента на странице
     chatBox.innerHTML += `<div class="message user"><strong>You:</strong> ${userMessage}</div>`;
-    chatBox.scrollTop = chatBox.scrollHeight;
-    input.value = '';
+    chatBox.scrollTop = chatBox.scrollHeight; // Прокручиваем чат вниз к последнему сообщению
+    input.value = ''; // Очищаем поле ввода
 
-    // Send to backend (adjust endpoint as needed)
+    // fetch это современный API для выполнения HTTP-запросов (например, GET, POST) к серверу.
+    // Он возвращает Promise (обещание получить данные в будущем).
+    // Что делает await?
+    // await - это оператор, который:
+    // Приостанавливает выполнение асинхронной функции
+    // Ждет, пока Promise завершится
+    // Возвращает результат Promise
+
+    // Отправка сообщения на сервер.
+    // Отправляем асинхронный POST-запрос на сервер и ждем ответ
     const response = await fetch('/chat', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({message: userMessage})
+        method: 'POST', // Тип HTTP-запроса
+        headers: {'Content-Type': 'application/json'}, // Заголовки запроса
+        body: JSON.stringify({message: userMessage}) // Тело запроса в формате JSON
     });
+    
+    // Получаем ответ от сервера 
+    // и ждем, пока данные преобразуются из JSON
     const data = await response.json();
 
-    // Display LLM response
+    // Почему это нужно?
+    // Асинхронность - запросы к серверу занимают время
+    // Неблокирующее выполнение - другой код может выполняться, пока мы ждем ответ
+    // Последовательность - мы получаем данные только после успешного завершения запроса
+
+    // Отображаем ответ ИИ в чате
     chatBox.innerHTML += `<div class="message llm"><strong>LLM:</strong> ${data.reply}</div>`;
+    
+    // Прокручиваем чат вниз к ответу ИИ
     chatBox.scrollTop = chatBox.scrollHeight;
 });
+

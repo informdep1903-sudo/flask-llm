@@ -1,24 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Основные мета-теги для кодировки и адаптивного отображения -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat with LLM</title>
+    <!-- Подключение внешнего CSS файла с помощью Flask url_for -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <!-- Основной контейнер чата -->
     <div class="chat-container">
+        <!-- Область отображения истории чата -->
         <div id="chat-box" class="chat-box">
+            <!-- Цикл по записям истории чата из бэкенда Flask -->
             {% for entry in chat_history %}
+                <!-- Отображение сообщений пользователя -->
                 <div class="message user"><strong>You:</strong> {{ entry.user_message }}</div>
+                <!-- Отображение ответов ИИ -->
                 <div class="message llm"><strong>LLM:</strong> {{ entry.llm_reply }}</div>
             {% endfor %}
         </div>
+        <!-- Форма ввода сообщений -->
         <form id="chat-form" autocomplete="off">
-            <input type="text" id="user-input" placeholder="Type your message..." required>
-            <button type="submit">Send</button>
+            <!-- Текстовое поле для ввода сообщений пользователя -->
+            <input type="text" id="user-input" placeholder="Введите сообщение..." required>
+            <!-- Кнопка отправки сообщения -->
+            <button type="submit">Отправить</button>
         </form>
     </div>
+    <!-- Подключение внешнего JavaScript файла с помощью Flask url_for -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

@@ -1,9 +1,12 @@
+/* Основные стили для body */
 body {
     font-family: Arial, sans-serif;
     background: #f4f4f4;
     margin: 0;
     padding: 0;
 }
+
+/* Контейнер чата с тенью и закругленными углами */
 .chat-container {
     max-width: 500px;
     margin: 40px auto;
@@ -12,6 +15,8 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     padding: 20px;
 }
+
+/* Область чата со скроллом */
 .chat-box {
     height: 300px;
     overflow-y: auto;
@@ -21,20 +26,30 @@ body {
     margin-bottom: 10px;
     background: #fafafa;
 }
+
+/* Общие стили для сообщений */
 .message {
     margin: 8px 0;
 }
+
+/* Стили сообщений пользователя (справа, синий цвет) */
 .user {
     text-align: right;
     color: #1976d2;
 }
+
+/* Стили сообщений ИИ (слева, зеленый цвет) */
 .llm {
     text-align: left;
     color: #388e3c;
 }
+
+/* Форма ввода сообщений с flex-контейнером */
 #chat-form {
     display: flex;
 }
+
+/* Поле ввода сообщения */
 #user-input {
     flex: 1;
     padding: 8px;
@@ -42,6 +57,8 @@ body {
     border-radius: 4px 0 0 4px;
     outline: none;
 }
+
+/* Кнопка отправки сообщения */
 #chat-form button {
     padding: 8px 16px;
     border: none;
@@ -50,6 +67,8 @@ body {
     border-radius: 0 4px 4px 0;
     cursor: pointer;
 }
+
+/* Эффект наведения на кнопку */
 #chat-form button:hover {
     background: #1565c0;
 }

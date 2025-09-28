@@ -1,3 +1,12 @@
+# Создание объекта для работы с базой данных, 
+# определение  класса LLMService  и создание экземпляра
+# для взаимодействия с внешней языковой моделью (LLM).
+
+# Импортируем необходимые библиотеки:
+# flask_sqlalchemy - для работы с базой данных
+# openai - для взаимодействия с API языковых моделей
+# dotenv - для загрузки переменных окружения
+# logging - для журналирования ошибок
 from flask_sqlalchemy import SQLAlchemy
 import openai
 import dotenv
@@ -10,8 +19,8 @@ logger = logging.getLogger(__name__)
 # Загружаем переменные окружения из файла .env
 try:
     env = dotenv.dotenv_values(".env")
-    YA_API_KEY = env["YA_API_KEY"]
-    YA_FOLDER_ID = env["YA_FOLDER_ID"]
+    YA_API_KEY = env["YA_API_KEY"]      # API ключ для доступа к Yandex LLM
+    YA_FOLDER_ID = env["YA_FOLDER_ID"]   # Идентификатор каталога в Yandex Cloud
 except FileNotFoundError:
     raise FileNotFoundError("Файл .env не найден. Убедитесь, что он существует в корневой директории проекта.")
 except KeyError as e:
@@ -55,16 +64,18 @@ class LLMService:
             prompt_file (str): Путь к файлу с системным промптом для LLM.
         """
         # Читаем системный промпт из файла и сохраняем в атрибут sys_prompt
+        # Используем encoding='utf-8' для корректной работы с русским языком
         with open(prompt_file, encoding='utf-8') as f:
             self.sys_prompt = f.read()
                 
         try:
-            # Создаём клиента OpenAI с вашим API-ключом и базовым URL для Yandex LLM API
+            # Создаём клиента OpenAI с API-ключом и базовым URL для Yandex LLM API
+            # base_url указывает на эндпоинт Yandex вместо стандартного OpenAI
             self.client = openai.OpenAI(
                 api_key=YA_API_KEY,
                 base_url="https://llm.api.cloud.yandex.net/v1",
             )
-            # Формируем путь к модели с использованием идентификатора каталога из .env
+            # Формируем полный путь к модели, включая идентификатор каталога
             self.model = f"gpt://{YA_FOLDER_ID}/yandexgpt-lite"
 
         except Exception as e:
@@ -81,26 +92,28 @@ class LLMService:
             str: Ответ языковой модели или сообщение об ошибке.
         """
         try:
-            # Выполняем запрос к API языковой модели
+            # Формируем и отправляем запрос к API
+            # Включаем системный промпт и сообщение пользователя
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": self.sys_prompt},
-                    {"role": "user", "content": message},
+                    {"role": "system", "content": self.sys_prompt},  # Задаёт системный промпт
+                    {"role": "user", "content": message},            # Сообщение от пользователя
                 ],
-                temperature=1.0,      # Параметр креативности
-                max_tokens=1024,      # Максимальная длина ответа
+                temperature=1.0,      # Параметр креативности (0.0 - строго, 1.0 - творчески)
+                max_tokens=1024,      # Максимальная длина ответа в токенах
             )
 
-            # Возвращаем текст ответа модели
+            # Извлекаем текст ответа из первого (и единственного) варианта
             return response.choices[0].message.content
 
         except Exception as e:
-            # В случае ошибки возвращаем её описание
+            # Логируем ошибку и возвращаем понятное пользователю сообщение
             logger.error(f"Произошла ошибка: {str(e)}")
             return f"Произошла ошибка: {str(e)}"
 
 
+# Создаём экземпляр сервиса LLM с указанием файла промпта
 llm_1 = LLMService('prompts/prompt_1.txt')
 
 
@@ -114,5 +127,6 @@ def chat_with_llm(user_message):
     Возвращает:
         str: Ответ LLM.
     """
+    # Отправляем сообщение в сервис LLM и возвращаем полученный ответ
     response = llm_1.chat(user_message)
     return response
